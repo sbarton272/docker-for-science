@@ -22,13 +22,14 @@ def run_image(tool_name, mount_point, port):
 
     image_name = TOOLS[tool_name]['image']
     port_map = '{}:{}'.format(TOOLS[tool_name]['port'], port or TOOLS[tool_name]['port'])
-    volume_map = '{}:{}'.format(mount_point or os.getcwd(), TOOLS[tool_name]['mount_point'])
+    volume_map = '{}:{}'.format(os.path.abspath(mount_point) or os.getcwd(), TOOLS[tool_name]['mount_point'])
     check_call(['docker', 'run', '-p', port_map, '-v', volume_map, '-it', image_name])
 
 def command_line_interface():
     """Basic entrypoint"""
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('tool_name', metavar='TOOL', help='Choose a tool to start', choices=TOOLS.keys())
+    help_msg = 'Choose a tool to start. Choices: [{}]'.format(', '.join(TOOLS.keys()))
+    parser.add_argument('tool_name', metavar='TOOL', help=help_msg, choices=TOOLS.keys())
     parser.add_argument('--mount_point', help='Choose which directory on your computer to connect to the docker image')
     parser.add_argument('--port', help='Choose port where tool will run in your browser localhost:<port>')
 
